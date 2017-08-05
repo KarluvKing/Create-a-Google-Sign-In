@@ -189,7 +189,10 @@ def restaurantsJSON():
 @app.route('/restaurant/')
 def showRestaurants():
     restaurants = session.query(Restaurant).order_by(asc(Restaurant.name))
-    return render_template('restaurants.html', restaurants=restaurants)
+    if 'username' not in login_session:
+      return render_template('publicrestaurants.html', restaurants=restaurants)
+    else:
+      return render_template('restaurants.html', restaurants=restaurants)
 
 # Create a new restaurant
 
@@ -248,7 +251,10 @@ def showMenu(restaurant_id):
     restaurant = session.query(Restaurant).filter_by(id=restaurant_id).one()
     items = session.query(MenuItem).filter_by(
         restaurant_id=restaurant_id).all()
-    return render_template('menu.html', items=items, restaurant=restaurant)
+    if 'username' not in login_session or creator.id != login_session['user_id']:
+      return render_template('publicmenu.html', items=items, restaurant=restaurant, creator=creator)
+    else:
+      return render_template('menu.html', items=items, restaurant=restaurant, creator=creator)
 
 
 # Create a new menu item
